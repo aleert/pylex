@@ -5,23 +5,23 @@ A small tool for statical code analysis made for fun and study.
 It can count most common words used in function defenitions, class defenitions etc.
 
 ### Example usage:
-* Count all verbs used in names of django funcions
+* Count all verbs used in names of django and tornado funcions:
 ```
-pylex count django
+pylex django tornado
 ```
-that is equivalent to 
+that is equivalent to:
 ```
-pylex count django --pt-of-speech='VB' --node-type='FunctionDef'
+pylex django tornado --pt-of-speech='VB' --node-type='FunctionDef'
 ```
-which is also equivalent to shorthand options syntax
+which is also equivalent to shorthand options syntax:
 ```
-pylex count django --P='VB' --N='FunctionDef'
+pylex django tornado -P='VB' -N='FunctionDef'
 ```
 
 * Explore five most common names that are nouns for every *.py file classes under the
 directory you are currently in:
 ```
-pylex count . --top=5 --P='NN' --N='ClassDef' --S
+pylex . --top=5 -P='NN' -N='ClassDef' --S
 ```
 
 ### How to install.
