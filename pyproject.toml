@@ -5,7 +5,7 @@ description = "Small CLI tool for lexical analysis of python code."
 authors = ["Aleksei Panfilov"]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.6.1"
 nltk = "^3.4"
 
 [tool.poetry.dev-dependencies]
