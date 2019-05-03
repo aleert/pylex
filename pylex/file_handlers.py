@@ -2,6 +2,7 @@
 
 """Utilities to find *.py files and explore their ASTs."""
 import ast
+import logging
 from collections import Counter
 from importlib import import_module
 from pathlib import Path
@@ -54,9 +55,11 @@ def get_py_from_module(module_or_path: str) -> Generator[Path, None, None]:  # n
     raise OSError('Cannot open path \'{0}\''.format(path))
 
 
-def get_all_py(modules: List[Text]) -> Generator[Path, None, None]:
+def get_all_py(modules: List[Text], write_log: bool = False) -> Generator[Path, None, None]:
     """Generate *py files from many modules or paths."""
     for module in modules:
+        if write_log:
+            logging.info('Processing {0}'.format(module))
         yield from get_py_from_module(module)
 
 
@@ -66,7 +69,7 @@ def tree_from_py_file_path(pyfile: Path) -> Tuple[ast.Module, str]:
         tree = ast.parse(pyfile.read_bytes())
         return tree, str(pyfile)
     except SyntaxError:
-        raise SyntaxError('cannot parse {0}'.format(pyfile))
+        logging.error('cannot parse {0}'.format(pyfile))
 
 
 def gen_node_names_from_tree(
