@@ -6,7 +6,7 @@ import collections
 import logging
 from typing import Counter, Dict, NewType, Tuple, cast
 
-from file_handlers import count_pt_of_speech_in_tree, get_all_py, tree_from_py_file_path
+from pylex.file_handlers import count_pt_of_speech_in_tree, get_all_py, tree_from_py_file_path
 
 
 def prepare_parser() -> argparse.ArgumentParser:
