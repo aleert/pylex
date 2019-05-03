@@ -45,7 +45,7 @@ pip install <generated_file_name>.whl
 ### How to use.
 If you installed it as CLI you can run
 ```
-pylex count <modules> <options>
+pylex <modules> <options>
 ```
 if you just copied repository - run
 ```
@@ -56,9 +56,9 @@ or paths to *.py files or path to folders(incl. relative paths).
 
 ### Available options
 * --top=N : Print only N most common words. 
-* --P|--pt-of-speech= : Part of speech as of nltk.help.upenn_tagset() (NN for noun,
+* -P|--pt-of-speech= : Part of speech as of nltk.help.upenn_tagset() (NN for noun,
                 VB for verb, CD for cardinal etc.)
-* --N|--node-type= : Node type to explore. FunctionDef, AsyncFunctionDef and ClassDef
+* -N|--node-type= : Node type to explore. FunctionDef, AsyncFunctionDef and ClassDef
              are currently accepted. 
-* --S|--split : Generate output for every *.py file explored.
+* -S|--split : Generate output for every *.py file explored.
 
