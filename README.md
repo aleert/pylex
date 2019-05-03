@@ -33,7 +33,7 @@ After you clone this repository you should get poetry with
 pip install poetry
 ```
 After that navigate to folder with `pyproject.toml` and run
-```python
+```
 poetry build
 ```
 Now you will have a `dist/` folder with `.whl` file. Install it with
