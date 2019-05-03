@@ -43,13 +43,20 @@ pip install <generated_file_name>.whl
 
 
 ### How to use.
-If you installed it as CLI you can run
+If you never used `nltk` before you may need to download some data.
+```python
+import nltk
+nltk.download('averaged_perceptron_tagger')
+```
+should be enough.
+
+If you installed `pylex` as CLI you can run
 ```
 pylex <modules> <options>
 ```
-if you just copied repository - run
+If you just copied repository - run
 ```
-python ./pylex/cli.py count <modules> <options>
+python ./pylex/cli.py <modules> <options>
 ```
 For `<modules>` you can specify either installed packages,
 or paths to *.py files or path to folders(incl. relative paths).
