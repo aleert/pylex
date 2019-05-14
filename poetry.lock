@@ -267,7 +267,7 @@ version = "0.2.3"
 flake8 = "*"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Git Object Database"
 name = "gitdb2"
 optional = false
@@ -278,7 +278,7 @@ version = "2.0.5"
 smmap2 = ">=2.0.0"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Python Git Library"
 name = "gitpython"
 optional = false
@@ -379,7 +379,7 @@ python-versions = ">=2.6, !=3.0.*, !=3.1.*"
 version = "1.12.0"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "A pure Python implementation of a sliding window memory map manager"
 name = "smmap2"
 optional = false
@@ -466,8 +466,8 @@ pep8-naming = ">=0.7,<0.9"
 typing_extensions = ">=3.6,<4.0"
 
 [metadata]
-content-hash = "a9ef6acbc192d3b3f7603d7f08f604faf1fd1aed89210b0019b9f798eabaecd3"
-python-versions = "^3.7"
+content-hash = "0b2ed032f9366c72fd706441828d2637b21ea7b530bc0f5c64b2a232b1f78ab7"
+python-versions = "^3.6.1"
 
 [metadata.hashes]
 astor = ["95c30d87a6c2cf89aa628b87398466840f0ad8652f88eb173125a6df8533fb8d", "fb503b9e2fdd05609fbf557b916b4a7824171203701660f0c55bbf5a7a68713e"]
