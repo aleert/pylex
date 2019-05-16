@@ -4,11 +4,10 @@
 import argparse
 import collections
 import logging
-import sys
 from typing import Counter, Dict, NewType, Tuple, cast
 
 from pylex.file_handlers import count_pt_of_speech_in_tree, get_all_py, tree_from_py_file_path
-from pylex.formatters import CSVFormatter, JsonFormatter, JsonHandlerFilter
+from pylex.formatters import CSVFormatter, FileHandlerFilter, JsonFormatter
 
 
 def prepare_parser() -> argparse.ArgumentParser:  # noqa: Z213
@@ -77,13 +76,14 @@ def prepare_parser() -> argparse.ArgumentParser:  # noqa: Z213
         help='Log entry while processing every file.',
     )
 
-    parser.add_argument(
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument(
         '--json',
         action='store_true',
         help='JSON output.',
     )
 
-    parser.add_argument(
+    group.add_argument(
         '--csv',
         action='store_true',
         help='CSV output.',
@@ -113,7 +113,7 @@ def process_with_split_output(  # noqa: Z210
             'counts': cntr.most_common(num_top),
             'files_explored': 1,
             'nodes_explored': node_count,
-            'names_explored': filename,
+            'file_name': filename,
         }
         extra_info.update(kwargs)
         logging.info(
@@ -175,18 +175,16 @@ def make_logger(
 
     ch = logging.StreamHandler()
 
+    if filename:
+        ch = logging.FileHandler(filename=filename)
+
     if is_json:
-        if filename:
-            ch = logging.FileHandler(filename=filename)
         ch.setFormatter(JsonFormatter('%(message)s'))
-        ch.addFilter(JsonHandlerFilter())
+        ch.addFilter(FileHandlerFilter())
 
     if is_csv:
-        if filename:
-            ch.setFormatter(CSVFormatter(filename))
-        else:
-            ch.setFormatter(CSVFormatter(sys.stdout))
-        ch.addFilter(JsonHandlerFilter())
+        ch.setFormatter(CSVFormatter())
+        ch.addFilter(FileHandlerFilter())
 
     ch.setLevel(logging_level)
     logger.addHandler(ch)
