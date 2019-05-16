@@ -6,8 +6,9 @@ import collections
 import logging
 from typing import Counter, Dict, NewType, Tuple, cast
 
-from pylex.file_handlers import count_pt_of_speech_in_tree, get_all_py, tree_from_py_file_path
-from pylex.formatters import CSVFormatter, FileHandlerFilter, JsonFormatter
+from pylex.file_handlers import get_all_py
+from visit_nodes import count_pt_of_speech_in_tree
+from formatters import CSVFormatter, FileHandlerFilter, JsonFormatter
 
 
 def prepare_parser() -> argparse.ArgumentParser:  # noqa: Z213
@@ -137,7 +138,7 @@ def process_with_single_output(  # noqa: Z210
     total_counts = collections.Counter()
     nodes_explored = 0
     files_explored = 0
-    for filename, (cntr, node_count) in all_files.items():  # noqa: Z460, Z446
+    for _filename, (cntr, node_count) in all_files.items():  # noqa: Z460, Z446
         total_counts.update(cntr)
         nodes_explored += node_count
         files_explored += 1
@@ -205,14 +206,14 @@ def main():  # noqa: Z210
     all_files = {}  # type: AllFiles
 
     try:
-        for module in get_all_py(args.modules, write_log=True):
-            tree, filename = tree_from_py_file_path(module)
+        for py_file in get_all_py(args.modules, write_log=True):
 
-            logging.debug('Parsing trees in {0}'.format(filename))
-            all_files[cast(FileName, filename)] = cast(AllFilesEntry, count_pt_of_speech_in_tree(
-                tree,
+            all_files[cast(FileName, str(py_file))] = cast(AllFilesEntry, count_pt_of_speech_in_tree(
+                py_file,
                 target_part=args.pt_of_speech,
-                node_type=args.node_type,
+                node_types=[args.node_type],
+                exclude_dunder=True,
+                exclude_private=False,
             ))
     except (OSError, FileNotFoundError) as error:
         logging.error('<error>' + str(error) + '</error>')
