@@ -1,11 +1,14 @@
+# -*- coding: utf-8 -*-
+
 import ast
 from ast import NodeVisitor
 from pathlib import Path
 from typing import Iterable
 
-import visitor_mixins
+from pylex import visitor_mixins
 
 NODE_TYPES = {
+
     'FunctionDef': visitor_mixins.FunctionDefMixin,
     'function': visitor_mixins.FunctionDefMixin,
     'ClassDef': visitor_mixins.ClassDefMixin,

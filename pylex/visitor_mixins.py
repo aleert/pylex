@@ -2,9 +2,9 @@
 
 """Mixins for ast.NodeVisitor for different types of nodes."""
 from collections import Counter
+from typing import Text
 
 import nltk
-from typing import Text
 
 
 def is_part_of_speech(word: Text, target_part: Text = 'VB') -> bool:
@@ -32,7 +32,7 @@ def is_private(name):
     return False
 
 
-class BaseMixin:
+class BaseMixin(object):
     """Implement convinient methods."""
 
     def __init__(self, pt_of_speech, exclude_dunder=True, exclude_private=True):
@@ -85,5 +85,3 @@ class AssignMixin(BaseMixin):
                     self.counter.update([name_chunk])
         self.nodes_explored += 1
         return self.generic_visit(node)
-
-

@@ -7,8 +7,8 @@ import logging
 from typing import Counter, Dict, NewType, Tuple, cast
 
 from pylex.file_handlers import get_all_py
-from visit_nodes import count_pt_of_speech_in_tree
-from formatters import CSVFormatter, FileHandlerFilter, JsonFormatter
+from pylex.formatters import CSVFormatter, FileHandlerFilter, JsonFormatter
+from pylex.visit_nodes import count_pt_of_speech_in_tree
 
 
 def prepare_parser() -> argparse.ArgumentParser:  # noqa: Z213
@@ -208,13 +208,16 @@ def main():  # noqa: Z210
     try:
         for py_file in get_all_py(args.modules, write_log=True):
 
-            all_files[cast(FileName, str(py_file))] = cast(AllFilesEntry, count_pt_of_speech_in_tree(
-                py_file,
-                target_part=args.pt_of_speech,
-                node_types=[args.node_type],
-                exclude_dunder=True,
-                exclude_private=False,
-            ))
+            all_files[cast(FileName, str(py_file))] = cast(
+                AllFilesEntry,
+                count_pt_of_speech_in_tree(
+                    py_file,
+                    target_part=args.pt_of_speech,
+                    node_types=[args.node_type],
+                    exclude_dunder=True,
+                    exclude_private=False,
+                ),
+            )
     except (OSError, FileNotFoundError) as error:
         logging.error('<error>' + str(error) + '</error>')
 
