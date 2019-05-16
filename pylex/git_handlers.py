@@ -9,6 +9,7 @@ import contextlib
 import logging
 import os
 import shutil
+import stat
 import sys
 from pathlib import Path
 
@@ -25,7 +26,7 @@ def download_git_repo(url: str, depth: int = 1) -> Path:
     # clear temp dir from previous run
     try:
         if Path(appdir).exists():
-            shutil.rmtree(appdir)
+            shutil.rmtree(appdir, onerror=remove_readonly)
         os.makedirs(appdir)
     except PermissionError:
         raise PermissionError('Please, provide access to cache directory at {0}'.format(appdir))
@@ -35,7 +36,7 @@ def download_git_repo(url: str, depth: int = 1) -> Path:
             Repo.clone_from(url=url, to_path=appdir, depth=depth, progress=Progress(stdout=stdout))
         except GitCommandError:
             logging.error('Couldn\'t download git repository {0}.'.format(url))
-            shutil.rmtree(appdir)
+            shutil.rmtree(appdir, onerror=remove_readonly)
 
     return Path(appdir)
 
@@ -86,3 +87,9 @@ class Progress(RemoteProgress):
                 self.stdout.write('\n')
                 self.stdout.flush()
                 self.separate_resolve = False
+
+
+def remove_readonly(func, path, _):
+    """Clear the readonly bit and reattempt the removal."""
+    os.chmod(path, stat.S_IWRITE)
+    func(path)
