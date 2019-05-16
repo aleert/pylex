@@ -25,9 +25,8 @@ def download_git_repo(url: str, depth: int = 1) -> Path:
     # clear temp dir from previous run
     try:
         if Path(appdir).exists():
-            with contextlib.suppress(FileNotFoundError):
-                shutil.rmtree(appdir)
-        os.mkdir(appdir)
+            shutil.rmtree(appdir)
+        os.makedirs(appdir)
     except PermissionError:
         raise PermissionError('Please, provide access to cache directory at {0}'.format(appdir))
 
