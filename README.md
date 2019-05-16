@@ -65,7 +65,12 @@ or paths to *.py files or path to folders(incl. relative paths).
 * --top=N : Print only N most common words. 
 * -P|--pt-of-speech= : Part of speech as of nltk.help.upenn_tagset() (NN for noun,
                 VB for verb, CD for cardinal etc.)
-* -N|--node-type= : Node type to explore. FunctionDef, AsyncFunctionDef and ClassDef
+* -N|--node-type= : Node type to explore. FunctionDef (or just function), ClassDef(class) and Assign(assign)
              are currently accepted. 
 * -S|--split : Generate output for every *.py file explored.
+* --json, --csv: output as json or csv
+* -O|--output=: print output to file. Do not write progress info if --json or --csv selected.
 
+### Known issues
+If you try to explore git repo on Windows, git progress will be somewhat meshed. Otherwise function normally,
+and writing json or csv to files does not include git progress.
