@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Generator, List, Text, Tuple
 
 import nltk
+from tqdm import tqdm
 
 accepted_node_types = {
     'FunctionDef': ast.FunctionDef,
@@ -19,7 +20,7 @@ accepted_node_types = {
 }
 
 
-# looks like we have to deal with Jones complexity 8 here
+# looks like we have to deal with high complexity here
 def get_py_from_module(module_or_path: str) -> Generator[Path, None, None]:  # noqa: C901
     """
     Generate all *.py files in module or path.
@@ -40,7 +41,7 @@ def get_py_from_module(module_or_path: str) -> Generator[Path, None, None]:  # n
         elif hasattr(module, '__file__'):
             path = Path(module.__file__)
         else:
-            raise FileNotFoundError('Can\'t find {0} files location.'.format(module))
+            raise FileNotFoundError('Can\'t find files for module {0}.'.format(module))
     except (ImportError, TypeError):
         path = Path(module_or_path)
 
@@ -60,11 +61,13 @@ def get_all_py(modules: List[Text], write_log: bool = False) -> Generator[Path, 
     for module in modules:
         if write_log:
             logging.info('Processing {0}'.format(module))
-        yield from get_py_from_module(module)
+            yield from tqdm(get_py_from_module(module), unit=' files', desc='Parsing')
+        else:
+            yield from get_py_from_module(module)
 
 
 def tree_from_py_file_path(pyfile: Path) -> Tuple[ast.Module, str]:
-    """Return tree with filename given path to *.py file."""
+    """Return tree with filename given Path to *.py file."""
     try:
         tree = ast.parse(pyfile.read_bytes())
         return tree, str(pyfile)
@@ -78,12 +81,12 @@ def gen_node_names_from_tree(
     exclude_dunder: bool = True,
 ) -> Generator[str, None, None]:
     """
-    Generate all `node_type` (name, nodes_inspected_so_far) tuples from tree.
+    Generate all `node_type` names from tree.
 
     If `exclude_dunder` any dunder names wont be counted.
 
     `node_type` has to have `name` field.
-    As of python3.7 those are (AsyncFunctionDef, FunctionDef, ClassDef, alias and ExceptHandler.
+    As of python3.7 those are AsyncFunctionDef, FunctionDef, ClassDef, alias and ExceptHandler.
     """
     nd_type = accepted_node_types.get(node_type, '')
     if not nd_type:

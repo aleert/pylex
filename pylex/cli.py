@@ -6,7 +6,8 @@ import collections
 import logging
 from typing import Counter, Dict, NewType, Tuple, cast
 
-from pylex.file_handlers import count_pt_of_speech_in_tree, get_all_py, tree_from_py_file_path
+from file_handlers import count_pt_of_speech_in_tree, get_all_py, tree_from_py_file_path
+from formatters import JsonFormatter, JsonHandlerFilter
 
 
 def prepare_parser() -> argparse.ArgumentParser:
@@ -51,10 +52,15 @@ def prepare_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         '-N',
         '--node-type',
-        dest='node_type',
         default='FunctionDef',
         choices=('FunctionDef', 'ClassDef', 'AsyncFunctionDef'),
         help=node_type_help,
+    )
+
+    parser.add_argument(
+        '-O',
+        '--output',
+        help='Output file name or path.',
     )
 
     parser.add_argument(
@@ -70,27 +76,46 @@ def prepare_parser() -> argparse.ArgumentParser:
         help='Log entry while processing every file.',
     )
 
+    parser.add_argument(
+        '--json',
+        action='store_true',
+        help='JSON output.',
+    )
+
     return parser
 
 
 # for type hinting
-FileName = NewType('FileName', str)  # noqa: N806
-NodeNameCounter = NewType('NodeNameCounter', Counter[str])  # noqa: N806
-TotalNodeNamesCount = NewType('TotalNodeNamesCount', int)  # noqa: N806
+FileName = NewType('FileName', str)
+NodeNameCounter = NewType('NodeNameCounter', Counter[str])
+TotalNodeNamesCount = NewType('TotalNodeNamesCount', int)
 AllFilesEntry = Tuple[NodeNameCounter, TotalNodeNamesCount]
 AllFiles = Dict[FileName, AllFilesEntry]
 
 
-def process_with_split_output(
+def process_with_split_output(  # noqa: Z210
     all_files: AllFiles,
     num_top: int,
+    **kwargs,
 ) -> None:
     """Make counts from all_files for separate output for each file."""
     for filename, (cntr, node_count) in all_files.items():  # noqa: Z460, Z446
-        logging.info('{0} nodes explored in file {1}'.format(
-            node_count,
-            filename,
-        ))
+        # for json formatter
+        extra_info = {
+            'num_top': num_top,
+            'counts': cntr.most_common(num_top),
+            'files_explored': 1,
+            'nodes_explored': node_count,
+            'names_explored': filename,
+        }
+        extra_info.update(kwargs)
+        logging.info(
+            '{0} nodes explored in file {1}'.format(
+                node_count,
+                filename,
+            ),
+            extra=extra_info,
+        )
         logging.info('Top {0} names are:'.format(num_top))
         for name, counts in cntr.most_common(num_top):
             logging.info('{0} : {1}'.format(name, counts))
@@ -99,22 +124,59 @@ def process_with_split_output(
 def process_with_single_output(  # noqa: Z210
     all_files: AllFiles,
     num_top: int,
+    **kwargs,
 ) -> None:
     """Make counts from all_files for joined output."""
     total_counts = collections.Counter()
     nodes_explored = 0
     files_explored = 0
-    for _filename, (cntr, node_count) in all_files.items():  # noqa: Z460, Z446
+    for filename, (cntr, node_count) in all_files.items():  # noqa: Z460, Z446
         total_counts.update(cntr)
         nodes_explored += node_count
         files_explored += 1
-    logging.info('Total {0} nodes in {1} files were explored.'.format(
-        nodes_explored,
-        files_explored,
-    ))
+
+    # for json formatter
+    extra_info = {
+        'num_top': num_top,
+        'counts': total_counts.most_common(num_top),
+        'files_explored': files_explored,
+        'nodes_explored': nodes_explored,
+    }
+    extra_info.update(kwargs)
+    logging.info(
+        'Total {0} nodes in {1} files were explored.'.format(
+            nodes_explored,
+            files_explored,
+        ),
+        extra=extra_info,
+    )
+
     logging.info('Top {0} names are: '.format(num_top))
     for name, counts in total_counts.most_common(num_top):
         logging.info('{0} : {1}'.format(name, counts))
+
+
+def make_logger(
+    logging_level: int,
+    is_json: bool = False,
+    is_csv: bool = False,
+    filename: str = None,
+) -> logging.Logger:
+    """Set appropriate handler and logger."""
+    logger = logging.getLogger()
+    logger.setLevel(logging_level)
+
+    ch = logging.StreamHandler()
+    if filename:
+        ch = logging.FileHandler(filename=filename)
+    ch.setLevel(logging_level)
+    if is_json:
+        ch.setFormatter(JsonFormatter('%(message)s'))
+        ch.addFilter(JsonHandlerFilter())
+
+    logger.addHandler(ch)
+
+    return logger
 
 
 def main():  # noqa: Z210
@@ -124,7 +186,8 @@ def main():  # noqa: Z210
     logging_level = logging.INFO
     if args.v:
         logging_level = logging.DEBUG
-    logging.basicConfig(level=logging_level, format='%(message)s')
+
+    make_logger(logging_level, filename=args.output, is_json=args.json)
 
     all_files = {}  # type: AllFiles
 
@@ -142,10 +205,22 @@ def main():  # noqa: Z210
         logging.error('<error>' + str(error) + '</error>')
 
     if args.split:
-        process_with_split_output(all_files, num_top=args.top)
+        process_with_split_output(
+            all_files,
+            num_top=args.top,
+            pt_of_speech=args.pt_of_speech,
+            node_type=args.node_type,
+            modules_explored=args.modules,
+        )
 
     else:
-        process_with_single_output(all_files, num_top=args.top)
+        process_with_single_output(
+            all_files,
+            num_top=args.top,
+            pt_of_speech=args.pt_of_speech,
+            node_type=args.node_type,
+            modules_explored=args.modules,
+        )
 
 
 if __name__ == '__main__':
