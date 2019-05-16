@@ -1,4 +1,4 @@
-# pylex
+[![asciicast](https://asciinema.org/a/yfPQ1cb9FFc21tJgroVc6K5jd.svg)](https://asciinema.org/a/yfPQ1cb9FFc21tJgroVc6K5jd?t=7)
 
 ### What it is?
 A small tool for statical code analysis made for fun and study.
