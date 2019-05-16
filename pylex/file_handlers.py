@@ -9,7 +9,10 @@ from pathlib import Path
 from typing import Generator, List, Text, Tuple
 
 import nltk
+from git import GitCommandError
 from tqdm import tqdm
+
+from pylex.git_handlers import download_git_repo
 
 accepted_node_types = {
     'FunctionDef': ast.FunctionDef,
@@ -30,6 +33,14 @@ def get_py_from_module(module_or_path: str) -> Generator[Path, None, None]:  # n
     Raises OSError if specified file or path doesn't exist or cant be accessed
     for other reasons (e.g. you you have no read permissions).
     """
+    if module_or_path.endswith('.git'):
+        try:
+            cloned_path = download_git_repo(module_or_path)
+            yield from cloned_path.glob('**/*.py')
+            return
+        except GitCommandError:
+            raise OSError('Cannot clone repo \'{0}\''.format(module_or_path))
+
     try:
         module = import_module(module_or_path)
 
@@ -53,7 +64,17 @@ def get_py_from_module(module_or_path: str) -> Generator[Path, None, None]:  # n
         yield from path.glob('**/*.py')
         return
 
-    raise OSError('Cannot open path \'{0}\''.format(path))
+    # it must be github account/repo pair then..
+    elif len(path.parts) == 2:
+        path = 'https://github.com/' + '/'.join(path.parts) + '.git'
+        try:
+            cloned_path = download_git_repo(path)
+            yield from cloned_path.glob('**/*.py')
+            return
+        except GitCommandError:
+            raise OSError('Cannot clone repo \'{0}\''.format(path))
+
+    raise OSError('Cannot resolve \'{0}\''.format(path))
 
 
 def get_all_py(modules: List[Text], write_log: bool = False) -> Generator[Path, None, None]:
@@ -73,6 +94,7 @@ def tree_from_py_file_path(pyfile: Path) -> Tuple[ast.Module, str]:
         return tree, str(pyfile)
     except SyntaxError:
         logging.error('cannot parse {0}'.format(pyfile))
+        return ast.Module(), ''
 
 
 def gen_node_names_from_tree(

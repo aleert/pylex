@@ -6,8 +6,8 @@ import collections
 import logging
 from typing import Counter, Dict, NewType, Tuple, cast
 
-from file_handlers import count_pt_of_speech_in_tree, get_all_py, tree_from_py_file_path
-from formatters import JsonFormatter, JsonHandlerFilter
+from pylex.file_handlers import count_pt_of_speech_in_tree, get_all_py, tree_from_py_file_path
+from pylex.formatters import JsonFormatter, JsonHandlerFilter
 
 
 def prepare_parser() -> argparse.ArgumentParser:
