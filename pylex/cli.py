@@ -54,7 +54,7 @@ def prepare_parser() -> argparse.ArgumentParser:  # noqa: Z213
         '-N',
         '--node-type',
         default='FunctionDef',
-        choices=('FunctionDef', 'ClassDef', 'AsyncFunctionDef'),
+        choices=('FunctionDef', 'function', 'ClassDef', 'class', 'Assign', 'assign'),
         help=node_type_help,
     )
 
