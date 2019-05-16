@@ -43,9 +43,11 @@ class BaseMixin:
         self.nodes_explored = 0
 
     def skip_name(self, name):
-        if is_private(name) or is_dunder(name):
-            return False
-        return True
+        if self.exclude_private and is_private(name):
+            return True
+        if self.exclude_dunder and is_dunder(name):
+            return True
+        return False
 
 
 class ClassDefMixin(BaseMixin):
