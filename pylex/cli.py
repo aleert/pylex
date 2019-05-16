@@ -4,13 +4,14 @@
 import argparse
 import collections
 import logging
+import sys
 from typing import Counter, Dict, NewType, Tuple, cast
 
 from pylex.file_handlers import count_pt_of_speech_in_tree, get_all_py, tree_from_py_file_path
-from pylex.formatters import JsonFormatter, JsonHandlerFilter
+from pylex.formatters import CSVFormatter, JsonFormatter, JsonHandlerFilter
 
 
-def prepare_parser() -> argparse.ArgumentParser:
+def prepare_parser() -> argparse.ArgumentParser:  # noqa: Z213
     """Initialize parser with arguments."""
     description = """Count parts of speech you specify in packages.
                   If no pt_of_speech provided, verb (VB) is used.
@@ -80,6 +81,12 @@ def prepare_parser() -> argparse.ArgumentParser:
         '--json',
         action='store_true',
         help='JSON output.',
+    )
+
+    parser.add_argument(
+        '--csv',
+        action='store_true',
+        help='CSV output.',
     )
 
     return parser
@@ -167,13 +174,21 @@ def make_logger(
     logger.setLevel(logging_level)
 
     ch = logging.StreamHandler()
-    if filename:
-        ch = logging.FileHandler(filename=filename)
-    ch.setLevel(logging_level)
+
     if is_json:
+        if filename:
+            ch = logging.FileHandler(filename=filename)
         ch.setFormatter(JsonFormatter('%(message)s'))
         ch.addFilter(JsonHandlerFilter())
 
+    if is_csv:
+        if filename:
+            ch.setFormatter(CSVFormatter(filename))
+        else:
+            ch.setFormatter(CSVFormatter(sys.stdout))
+        ch.addFilter(JsonHandlerFilter())
+
+    ch.setLevel(logging_level)
     logger.addHandler(ch)
 
     return logger
@@ -187,7 +202,7 @@ def main():  # noqa: Z210
     if args.v:
         logging_level = logging.DEBUG
 
-    make_logger(logging_level, filename=args.output, is_json=args.json)
+    make_logger(logging_level, filename=args.output, is_json=args.json, is_csv=args.csv)
 
     all_files = {}  # type: AllFiles
 
