@@ -9,6 +9,7 @@ python = "^3.6.1"
 nltk = "^3.4"
 appdirs = "^1.4"
 gitpython = "=2.1.8"
+tqdm = "^4.32"
 
 [tool.poetry.dev-dependencies]
 wemake-python-styleguide = "^0.8.1"
