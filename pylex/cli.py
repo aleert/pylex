@@ -47,8 +47,7 @@ def prepare_parser() -> argparse.ArgumentParser:  # noqa: Z213
     )
 
     node_type_help = """
-    Node type to explore. FunctionDef, AsyncFunctionDef and ClassDef
-    are currently accepted. }
+    Node type to explore. 
     """
     parser.add_argument(
         '-N',
