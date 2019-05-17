@@ -25,7 +25,7 @@ pylex . --top=5 -P='NN' -N='ClassDef' --S
 ```
 * Explore git repositories with shorthand syntax <user>/<package> available for github:
 ```
-pylex django/django --top=5 -P='NN' -N='assigh'
+pylex django/django --top=5 -P='NN' -N='assign'
 pylex https://github.com/django/django.git --top=5 -P='NN' -N='assigh'
 ```
 
@@ -59,16 +59,16 @@ For `<modules>` you can specify either installed packages,
 or paths to *.py files or path to folders(incl. relative paths).
 
 ### Available options
-* --top=N : Print only N most common words. 
-* -P|--pt-of-speech= : Part of speech as of  (NN for noun,
+* **--top=N** : Print only N most common words. 
+* **-P|--pt-of-speech=** : Part of speech as of  (NN for noun,
                 VB for verb, CD for cardinal etc.)
                 To list all available options run `nltk.help.upenn_tagset()` from python
                 or check [this stackoveflow question](https://stackoverflow.com/questions/15388831/what-are-all-possible-pos-tags-of-nltk)
-* -N|--node-type= : Node type to explore. FunctionDef (or just function), ClassDef(class) and Assign(assign)
+* **-N|--node-type=** : Node type to explore. FunctionDef (or just function), ClassDef(class) and Assign(assign)
              are currently accepted. 
-* -S|--split : Generate output for every *.py file explored.
-* --json, --csv: output as json or csv
-* -O|--output=: print output to file. Do not write progress info if --json or --csv selected.
+* **-S|--split** : Generate output for every *.py file explored.
+* **--json**, **--csv** : output as json or csv
+* **-O|--output=** : print output to file appending, if file exists. Do not write progress info if --json or --csv selected.
 
 ### Known issues
 If you try to explore git repo on Windows, git progress will be somewhat meshed. Otherwise function normally,
